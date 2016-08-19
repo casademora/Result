@@ -105,18 +105,18 @@ public extension ResultProtocol where Error: ErrorProtocolConvertible {
 
 // MARK: - Operators
 
-infix operator &&& : LogicalConjunctionPrecedence
+precedencegroup ChainingPrecedence {
+	associativity: left
+	higherThan: TernaryPrecedence
+}
+
+infix operator &&& : ChainingPrecedence
 
 /// Returns a Result with a tuple of `left` and `right` values if both are `Success`es, or re-wrapping the error of the earlier `Failure`.
 public func &&& <L: ResultProtocol, R: ResultProtocol> (left: L, right: @autoclosure () -> R) -> Result<(L.Value, R.Value), L.Error>
 	where L.Error == R.Error
 {
 	return left.flatMap { left in right().map { right in (left, right) } }
-}
-
-precedencegroup ChainingPrecedence {
-	associativity: left
-	higherThan: TernaryPrecedence
 }
 
 infix operator >>- : ChainingPrecedence
